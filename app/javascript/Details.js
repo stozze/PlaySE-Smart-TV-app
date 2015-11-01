@@ -253,7 +253,7 @@ Details.toHtml = function (programData) {
             html+='<a href="'+extra.loc+'" id="extraButton" class="link-button'
             if (programData.not_available)
                 html+=' selected'
-            html+='" style="margin-top:3px;">'+extra.name+'</a>';
+            html+='" style="margin-top:4px;">'+extra.name+'</a>';
         }
         html+=' </div>';
 	html+=' </div>';
@@ -261,7 +261,7 @@ Details.toHtml = function (programData) {
         html+='</div>';
 	html+='<img class="imagestyle" src="'+programData.thumb+'" alt="Image" />';
         // Add "header" elements last to determine max-height
-        var max_height = (extra) ? "280px" : "315px";
+        var max_height = (extra) ? "373px" : "420px";
         html='<div class="project-meta-frame" style="max-height:' +max_height+';overflow:hidden">'+html;
 	html = '<div class="project-name">' + html;
         html = '<div class="project-text">' + html;

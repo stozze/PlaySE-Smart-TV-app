@@ -669,10 +669,10 @@ loadFinished = function(status, refresh) {
 
 fixCss = function() {
     if (deviceYear >= 2014) {
-        $('#footer-clock').css({"bottom":"16px"});
-        $('.confirmExit').css({"padding":"6px 10px"});
+        $('#footer-clock').css({"bottom":"21px"});
+        $('.confirmExit').css({"padding":"8px 13px"});
     } else if (deviceYear > 2011) {
-        $('.confirmExit').css({"padding":"10px", "padding-bottom":"5px"});
+        $('.confirmExit').css({"padding":"13px","padding-bottom":"7px"});
     };
 };
 
@@ -772,7 +772,7 @@ toHtml = function(Item) {
     if (Item.name.length > 2*LINE_LENGTH)
         Item.description = "";
     else if (Item.name.length > LINE_LENGTH)
-        html += ' style=" max-height:11px;"';
+        html += ' style=" max-height:14px;"';
     html += '>' + Item.description + '</span>';
     html += '</div>';
     html += '</div>';

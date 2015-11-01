@@ -1,10 +1,10 @@
 var widgetAPI = new Common.API.Widget();
 var pluginAPI = new Common.API.Plugin();
-var MAX_WIDTH   = 960;
-var MAX_HEIGHT  = 540;
+var MAX_WIDTH   = 1280;
+var MAX_HEIGHT  = 720;
 var LINE_LENGTH = 45;
-var THUMB_WIDTH = 240;
-var THUMB_HEIGHT = 135;
+var THUMB_WIDTH = 320;
+var THUMB_HEIGHT = 180;
 var recommendedLinks = [];
 var isEmulator = false;
 var deviceYear  = null;

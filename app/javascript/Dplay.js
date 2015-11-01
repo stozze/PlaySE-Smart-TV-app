@@ -1,4 +1,4 @@
-var DETAILS_THUMB_FACTOR = 600/THUMB_WIDTH;
+var DETAILS_THUMB_FACTOR = 800/THUMB_WIDTH;
 var Dplay =
 {
     channel_idx:null,

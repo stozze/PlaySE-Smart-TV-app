@@ -73,7 +73,7 @@ Svt.getThumb = function(data, size) {
     if (!size || size == "small")
         return Thumb.replace(/\/(medium|(extra)?large)\//, "/small/")
     else if (size == "large")
-        return Thumb.replace(/\/(small|medium|extralarge)\//, "/large/")
+        return Thumb.replace(/\/(small|medium|large)\//, "/extralarge/")
     return Thumb
 }
 

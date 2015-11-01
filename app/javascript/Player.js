@@ -1534,7 +1534,7 @@ Player.getSubtitleSize = function () {
     if (savedValue) {
         return Number(savedValue);
     } else {
-        return 30;
+        return 40;
     }
 };
 
@@ -1543,7 +1543,7 @@ Player.getSubtitlePos = function () {
     if (savedValue) {
         return Number(savedValue);
     } else {
-        return 420;
+        return 560;
     }
 };
 
@@ -1552,7 +1552,7 @@ Player.getSubtitleLineHeight = function () {
     if (savedValue) {
         return Number(savedValue);
     } else {
-        return 100;
+        return 133;
     }
 };
 
@@ -1587,7 +1587,7 @@ Player.moveSubtitles = function (moveUp) {
     var oldValue = this.getSubtitlePos();
     var newValue = (moveUp) ? oldValue-2 : oldValue+2;
     Log("moveSubtitles new:" + newValue);
-    if (newValue > 300 && newValue < 550) {
+    if (newValue > 400 && newValue < 733) {
         $("#srtId").css("top", newValue); // write value to CSS
         this.saveSubtitlePos(newValue);
         this.showTestSubtitle();
@@ -1599,7 +1599,7 @@ Player.sizeSubtitles = function(increase) {
     var oldValue = this.getSubtitleSize();
     var newValue = (increase) ? oldValue+1 : oldValue-1;
     Log("sizeSubtitles new:" + newValue);
-    if (newValue > 15 && newValue < 51) {
+    if (newValue > 20 && newValue < 68) {
         $("#srtId").css("font-size", newValue); // write value to CSS
         this.saveSubtitleSize(newValue);
         this.showTestSubtitle();
@@ -1672,7 +1672,7 @@ GetMaxVideoHeight = function() {
 };
 
 Player.GetHelpText = function() {
-    var help = '<table style="margin-bottom:40px;width:100%;border-collapse:collapse;margin-left:auto;margin-right:auto;">'
+    var help = '<table style="margin-bottom:53px;width:100%;border-collapse:collapse;margin-left:auto;margin-right:auto;">'
     help = InsertHelpRow(help, "INFO", "Details");
     help = InsertHelpRow(help, "RED", "Repeat");
     help = InsertHelpRow(help, "YELLOW", "Subtitles");
@@ -1684,7 +1684,7 @@ Player.GetHelpText = function() {
 }
 
 InsertHelpRow = function(Html, Key, Text) {
-    var style =' style="padding:4px;border: 1px solid white;"'
+    var style =' style="padding:5px;border: 2px solid white;"'
     return Html+'<tr><td'+style+'>'+Key+'</td><td'+style+'>'+Text+"</td></tr>";
 }
 

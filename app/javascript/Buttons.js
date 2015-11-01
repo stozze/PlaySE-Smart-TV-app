@@ -106,7 +106,7 @@ Buttons.sscroll = function(hide)
     if(columnCounter > 0){
 	xaxis = columnCounter - 1;
     }
-    xaxis = -xaxis * 260;
+    xaxis = -xaxis * 347;
     animateCallbacked = 0;
     $('.content-holder').animate(
         {marginLeft: xaxis},

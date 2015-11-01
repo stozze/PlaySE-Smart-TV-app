@@ -1,4 +1,4 @@
-var VIASAT_DETAILS_IMG_SIZE="600x338";
+var VIASAT_DETAILS_IMG_SIZE="800x451";
 var Viasat =
 {
     channel_idx:null,

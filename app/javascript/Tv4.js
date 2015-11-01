@@ -1,4 +1,4 @@
-var TV4_DETAILS_IMG_SIZE="600x336";
+var TV4_DETAILS_IMG_SIZE="800x448";
 var Tv4 =
 {
     result:[],
