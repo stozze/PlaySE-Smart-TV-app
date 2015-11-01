@@ -5,8 +5,8 @@ var setClockOffsetTimer = null;
 var checkOffsetCounter = 5;
 var dateOffset = 0;
 var setDateOffsetTimer = null;
-var isTopRowSelected = true;
-var columnCounter = 0;
+var pageIndex = 0;
+var itemIndex = 0;
 var itemCounter = 0;
 var myLocation = "index.html";
 var myRefreshLocation = null;
@@ -141,11 +141,7 @@ setLocation = function(location, oldPos, skipHistory)
             myHistory.push(
                 {
                     loc: myLocation,
-                    pos: 
-                    {
-                        col: columnCounter,
-                        top: isTopRowSelected
-                    }
+                    pos: itemIndex
                 }
             );
         }
@@ -175,8 +171,8 @@ setLocation = function(location, oldPos, skipHistory)
     {
         itemSelected = null;
         itemCounter = 0;
-        columnCounter = 0;
-        isTopRowSelected = true;
+        pageIndex = 0;
+        itemIndex = 0;
     }
     resetHtml(oldPos, isDetails);
     loadingStart();
@@ -237,9 +233,8 @@ resetHtml = function(oldPos, isDetails)
     $('#projdetails').html("");
     // Delete and show list
     if ((isDetails && !detailsOnTop) || !detailsOnTop) {
-        $('#topRow').html("");
-        $('#bottomRow').html("");
-        $('.content-holder').css("marginLeft", "0");
+        $('#itemRow').html("");
+        $('.content-holder').css("marginTop", "0");
     }
     $(".slider-body").show();
     if (oldPos)
@@ -259,7 +254,7 @@ goBack = function(location)
 
 restorePosition = function() 
 {
-    if (myPos) {
+    if (myPos || myPos == 0) {
         setPosition(myPos);
     }
     if (myRefreshLocation) {
@@ -338,13 +333,11 @@ setPosition = function(pos)
     if (itemSelected) {
         itemSelected.removeClass('selected');
     } else {
-        $('.topitem').eq(0).removeClass('selected');
+        $('.itemlist').eq(0).removeClass('selected');
     }
-    if (pos.top) itemSelected = $('.topitem').eq(pos.col).addClass('selected');
-    else         itemSelected = $('.bottomitem').eq(pos.col).addClass('selected');
-    columnCounter    = pos.col;
-    isTopRowSelected = pos.top;
-    // Log("Position set to "  + columnCounter + " " + isTopRowSelected);
+    itemSelected = $('.itemlist').eq(pos).addClass('selected');
+    itemIndex    = pos;
+    // Log("Position set to "  + itemIndex);
     Buttons.sscroll();
 };
 
@@ -669,9 +662,13 @@ loadFinished = function(status, refresh) {
 
 fixCss = function() {
     if (deviceYear >= 2014) {
-        $('#footer-clock').css({"bottom":"21px"});
+        $('#footer-clock').css({"bottom":"15px"});
         $('.confirmExit').css({"padding":"8px 13px"});
     } else if (deviceYear > 2011) {
+        $('.topoverlay').css({"bottom":"70px", "font-weight":"normal"});
+        $('.bottomoverlay').css({"top":"26px", "font-weight":"normal"});
+        $('.topoverlayred').css({"bottom":"70px", "font-weight":"normal"});
+        $('.bottomoverlayred').css({"top":"26px", "font-weight":"normal"});
         $('.confirmExit').css({"padding":"13px","padding-bottom":"7px"});
     };
 };
@@ -731,16 +728,12 @@ toHtml = function(Item) {
     var html;
     var IsLiveText;
 
-    if(itemCounter % 2 == 0){
-	if(itemCounter > 0){
-	    html = '<div class="scroll-content-item topitem">';
-	}
-	else{
-	    html = '<div class="scroll-content-item selected topitem">';
-	}
+    itemIndex=0;
+    if(itemCounter > 0){
+	html = '<div class="scroll-content-item itemlist">';
     }
     else{
-	html = '<div class="scroll-content-item bottomitem">';
+	html = '<div class="scroll-content-item selected itemlist">';
     }
     if (Item.is_live || Item.is_channel) {
         IsLiveText = (Item.is_running) ? " is-live" : " not-yet-available";
@@ -756,12 +749,12 @@ toHtml = function(Item) {
 
     Item.starttime = dateToHuman(Item.starttime);
     if (Item.is_live && !Item.is_running) {
-	html += '<span class="topoverlay">LIVE</span>';
-	html += '<span class="bottomoverlay">' + Item.starttime + '</span>';
+	html += '<span class="topoverlay">LIVE';
+	html += '<span class="bottomoverlay">' + Item.starttime + '</span></span>';
     }
     else if (Item.is_live){
-	html += '<span class="topoverlayred">LIVE</span>';
-	html += '<span class="bottomoverlayred">' + Item.starttime + '</span>';
+	html += '<span class="topoverlayred">LIVE';
+	html += '<span class="bottomoverlayred">' + Item.starttime + '</span></span>';
     }
     html += '</div>';
     Item.name = Item.name.trim();
@@ -776,13 +769,8 @@ toHtml = function(Item) {
     html += '>' + Item.description + '</span>';
     html += '</div>';
     html += '</div>';
-    
-    if(itemCounter % 2 == 0){
-	$('#topRow').append($(html));
-    }
-    else{
-	$('#bottomRow').append($(html));
-    }
+
+    $('#itemRow').append($(html));    
     html = null;
     itemCounter++;
 };

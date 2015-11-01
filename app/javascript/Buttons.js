@@ -102,18 +102,13 @@ Buttons.clearKey = function()
 
 Buttons.sscroll = function(hide) 
 {
-    var xaxis = 0;
-    if(columnCounter > 0){
-	xaxis = columnCounter - 1;
-    }
-    xaxis = -xaxis * 347;
-    animateCallbacked = 0;
+    pageIndex = Math.floor(itemIndex/15);
+    var yaxis = pageIndex*-603;
     $('.content-holder').animate(
-        {marginLeft: xaxis},
+        {marginTop: yaxis},
         {complete: function() 
          {
-             animateCallbacked = animateCallbacked+1;
-             if (!hide && animateCallbacked == 2 && !$("#content-scroll").is(':visible')) {
+             if (!hide && !$("#content-scroll").is(':visible')) {
                  $("#content-scroll").show();
              }
          }
@@ -140,8 +135,7 @@ Buttons.keyHandleForExit = function()
 
 Buttons.keyHandleForList = function()
 {
-	var topItems = $('.topitem');
-	var bottomItems = $('.bottomitem');
+	var itemList = $('.itemlist');
 	var keyCode = event.keyCode;
 
         if (keyCode != lastKey) {
@@ -161,57 +155,45 @@ Buttons.keyHandleForList = function()
 	            keyTimer = window.setTimeout(this.clearKey, 300);
 
 		if (!itemSelected) {
-			itemSelected = topItems.eq(0).addClass('selected');
-			columnCounter = 0;
+			itemSelected = itemList.eq(0).addClass('selected');
+                        itemIndex = 0;
 		}
 		switch(keyCode)
 		{
 			case tvKey.KEY_RIGHT:
-                            if (keyHeld) {
-                                itemSelected = nextInList(topItems, bottomItems, itemSelected, 4);
-                            }
-                            else {
-                                itemSelected = nextInList(topItems, bottomItems, itemSelected, 1);
-                            }
+                            itemSelected = nextInList(itemList, itemSelected, 1);
 	                    break;
 
 	                case tvKey.KEY_CH_UP:
                         case tvKey.KEY_PANEL_CH_UP:         
 	                case tvKey.KEY_FF:
                         case tvKey.KEY_FF_:
-                            itemSelected = nextInList(topItems, bottomItems, itemSelected, 4);
+                            itemSelected = nextInList(itemList, itemSelected, 15);
 	                    break;
 				
 			case tvKey.KEY_LEFT:
-                            if (keyHeld) {
-                                itemSelected = prevInList(topItems, bottomItems, itemSelected, 4);
-                            }
-                            else {
-                                itemSelected = prevInList(topItems, bottomItems, itemSelected, 1);
-                            }
+                            itemSelected = prevInList(itemList, itemSelected, 1);
 	                    break;
 
             	        case tvKey.KEY_CH_DOWN:
          	        case tvKey.KEY_PANEL_CH_DOWN:
 	                case tvKey.KEY_RW:
                         case tvKey.KEY_REWIND_:
-                            itemSelected = prevInList(topItems, bottomItems, itemSelected, 4);
+                            itemSelected = prevInList(itemList, itemSelected, 15);
 	                    break;
 
 			case tvKey.KEY_DOWN:
-				if(isTopRowSelected && bottomItems.length > columnCounter){
-                                        isTopRowSelected = false;
-					itemSelected.removeClass('selected');
-					itemSelected = bottomItems.eq(columnCounter).addClass('selected');
-				}
-				break;
+                             if (keyHeld)
+                                 itemSelected = nextInList(itemList, itemSelected, 15);
+                             else
+                                 itemSelected = nextInList(itemList, itemSelected, 5);
+                             break;
 
 			case tvKey.KEY_UP:				
-		               if (!isTopRowSelected) {
-                                   isTopRowSelected = true;
-		                   itemSelected.removeClass('selected');
-               		           itemSelected = topItems.eq(columnCounter).addClass('selected');				
-                                }
+                                if (keyHeld)
+                                    itemSelected = prevInList(itemList, itemSelected, 15);
+                                else
+                                    itemSelected = prevInList(itemList, itemSelected, 5);
 				break;
 			case tvKey.KEY_INFO:
 			case tvKey.KEY_ENTER:
@@ -256,63 +238,73 @@ Buttons.keyHandleForList = function()
         }
 };
 
-nextInList = function(topItems, bottomItems, itemSelected, steps)
+nextInList = function(itemList, itemSelected, steps)
 {
-    itemSelected.removeClass('selected');
-    next = itemSelected.next();
-    while(--steps > 0 && next.length > 0){
-        if ((next.next()).length > 0)
-        {
-            columnCounter++;
-            itemSelected = next.addClass('selected');
-            itemSelected.removeClass('selected');
-            next = itemSelected.next();
+    var maxIndex = (itemList.length-1);
+    if (steps == 1) {
+        if ((itemIndex % 5) == 4 || !(itemSelected.next()).length) {
+            return movePrev(itemSelected, (itemIndex % 5));
+        } else {
+            return moveNext(itemSelected, steps)
         }
-    }
-
-    if (next.length > 0) {
-        columnCounter++;
-	itemSelected = next.addClass('selected');
-    } else if (isTopRowSelected) {
-	itemSelected = topItems.eq(0).addClass('selected');
-	columnCounter = 0;
-        isTopRowSelected = true;
+    } else if (steps == 5 || steps == 15) {
+        // Next Line        
+        if ((itemIndex + steps) <= maxIndex)
+            return moveNext(itemSelected, steps); 
+        else if (Math.floor(itemIndex/5) != Math.floor(maxIndex/5))
+            // Not on same line - swith to last item
+            return moveNext(itemSelected, maxIndex-itemIndex); 
+        else if (itemIndex > 4)
+            // We're on same and last line, move to first line instead
+            return movePrev(itemSelected, itemIndex-(itemIndex % 5));
+        else
+            return itemSelected;
     } else {
-	itemSelected = bottomItems.eq(0).addClass('selected');
-	columnCounter = 0;
-        isTopRowSelected = false;
+        return moveNext(itemSelected, steps);
     }
-    return itemSelected;
 };
 
-prevInList = function(topItems, bottomItems, itemSelected, steps)
-{
-    itemSelected.removeClass('selected');
-    prev = itemSelected.prev();
-    while(--steps > 0 && prev.length > 0){
-        if ((prev.prev()).length > 0)
-        {
-            columnCounter--;
-            itemSelected = prev.addClass('selected');
-            itemSelected.removeClass('selected');
-            prev = itemSelected.prev();
-        }
-    }
-
-    if (prev.length > 0) {
-        columnCounter--;
-	itemSelected = prev.addClass('selected');
-    } else if (topItems.length > bottomItems.length || isTopRowSelected) {
-	itemSelected = topItems.last().addClass('selected');
-	columnCounter = topItems.length - 1;
-        isTopRowSelected = true;
-    } else {
-	itemSelected = bottomItems.last().addClass('selected');
-	columnCounter = bottomItems.length - 1;
-        isTopRowSelected = false;
-    }
-    return itemSelected;
+moveNext = function(itemSelected, steps) {
+    return moveToItem(itemSelected, steps);
 };
+
+moveToItem = function(itemSelected, steps) {
+    itemSelected.removeClass('selected');
+    itemIndex = itemIndex+steps
+    itemSelected = $('.itemlist').eq(itemIndex);
+    return itemSelected.addClass('selected');
+};
+
+prevInList = function(itemList, itemSelected, steps)
+{
+    var maxIndex = (itemList.length-1);
+    if (steps == 1 && (itemIndex % 5) == 0) {
+        return moveNext(itemSelected, Math.min(4, maxIndex-itemIndex));
+    } else if (steps == 5 || steps == 15) {
+        // Previous Line        
+        if ((itemIndex - steps) >= 0)
+            return movePrev(itemSelected, steps); 
+        else if (maxIndex > 4) {
+            // We're on first line, move to last line instead
+            var newSteps = maxIndex-itemIndex;
+            if ((itemIndex+newSteps) % 5 > itemIndex % 5)
+                // Keep column if possible
+                newSteps = newSteps - (((itemIndex+newSteps)%5) - (itemIndex%5));
+            return moveNext(itemSelected, newSteps);
+        }
+        else
+            return itemSelected;
+    
+    } else {
+        return movePrev(itemSelected, steps);
+    }
+};
+
+movePrev = function(itemSelected, steps)
+{
+    return moveToItem(itemSelected, -steps);
+};
+
 
 Buttons.keyHandleForDetails = function()
 {
@@ -783,92 +775,53 @@ Buttons.playItem = function() {
 
 Buttons.findNextItem = function(play) {
 
-    var topItems = $('.topitem');
-    var bottomItems = $('.bottomitem');
+    var itemList = $('.itemlist');
+    var tmpItemIndex = itemIndex;
     var tmpItem;
-    var tmpTopSelected = isTopRowSelected
-    var tmpColumnCounter = columnCounter;
 
     while (true) {
-        // First go down if possible
-        if(tmpTopSelected) {
-            if (bottomItems.length > tmpColumnCounter) {
-                tmpTopSelected = false;
-	        tmpItem = bottomItems.eq(tmpColumnCounter);
-            } else if (!play && tmpColumnCounter != 0) {
-                // Start from beginning unless playing
-                tmpItem = topItems.eq(0);
-                tmpColumnCounter = 0;
-            } else {
-                // There is no more item
-                return -1
-            }
-        } else {
-            // Go Up and right
-            tmpTopSelected = true;
-            tmpItem = topItems.eq(tmpColumnCounter).next();
-            if (tmpItem.length <= 0) {
-                // Start from beginning unless playing
-                if (!play && tmpColumnCounter != 0) {
-                    tmpItem = topItems.eq(0);
-                    tmpColumnCounter = 0;
-                } else {
-                    // There is no more item
-                    return -1
-                }
-            } else {
-                tmpColumnCounter++;
-            }
+        tmpItemIndex = tmpItemIndex+1;
+        if (tmpItemIndex < itemList.length)
+            tmpItem = itemList.eq(tmpItemIndex)
+        else if (!play) {
+            tmpItemIndex = 0;
+            tmpItem = itemList.eq(tmpItemIndex);
         }
+        else
+            // There is no more item
+            return -1
+
         if (tmpItem.find('.ilink').attr("href") != undefined && 
             (tmpItem.find('.ilink').attr("href").search("details.html\\?") != -1 ||
              (tmpItem.find('.ilink').attr("href").search("(showList|categoryDetail).html\\?") != -1 && !play)) &&
             (!play || tmpItem.html().indexOf('not-yet-available') === -1)) {
-            return {item:tmpItem, top:tmpTopSelected, col:tmpColumnCounter}
+            return {item:tmpItem, index:tmpItemIndex}
         }
     }
 };
 
 Buttons.findPriorItem = function(play) {
 
-    var topItems = $('.topitem');
-    var bottomItems = $('.bottomitem');
+    var itemList = $('.itemlist');
+    var tmpItemIndex = itemIndex;
     var tmpItem;
-    var tmpTopSelected = isTopRowSelected
-    var tmpColumnCounter = columnCounter;
 
     while (true) {
-        // First go up
-        if(!tmpTopSelected) {
-            // Go Up
-            tmpTopSelected = true;
-            tmpItem = topItems.eq(tmpColumnCounter);
-        } else if (tmpColumnCounter == 0) {
-            // At first Item - go to last item unless playing
-            if (!play && topItems.length > 1) {
-                if (topItems.length > bottomItems.length) {
-	            tmpItem = topItems.last();
-	            tmpColumnCounter = topItems.length - 1;
-                    tmpTopSelected = true;
-                } else {
-	            tmpItem = bottomItems.last();
-	            tmpColumnCounter = bottomItems.length - 1;
-                    tmpTopSelected = false;
-                }
-            } else {
-                return -1;
-            }
-        } else {
-            // Go left and down
-            tmpColumnCounter--;
-            tmpTopSelected = false;
-            tmpItem = bottomItems.eq(tmpColumnCounter);
+        tmpItemIndex = tmpItemIndex-1;
+        if (tmpItemIndex >= 0)
+            tmpItem = itemList.eq(tmpItemIndex)
+        else if (!play) {
+            tmpItemIndex = itemList.length-1;
+            tmpItem = itemList.eq(tmpItemIndex);
         }
+        else
+            // There is no more item
+            return -1
         if (tmpItem.find('.ilink').attr("href") != undefined && 
             (tmpItem.find('.ilink').attr("href").search("details.html\\?") != -1 ||
              (tmpItem.find('.ilink').attr("href").search("(showList|categoryDetail).html\\?") != -1 && !play)) &&
             (!play || tmpItem.html().indexOf('not-yet-available') === -1)) {
-            return {item:tmpItem, top:tmpTopSelected, col:tmpColumnCounter}
+            return {item:tmpItem, index:tmpItemIndex}
         }
     }
 };
@@ -881,8 +834,7 @@ Buttons.runNextItem = function(direction, play) {
         tmpItem = this.findPriorItem(play);
     if (tmpItem != -1) {
         itemSelected.removeClass('selected');
-        columnCounter = tmpItem.col;
-        isTopRowSelected = tmpItem.top;
+        itemIndex = tmpItem.index;
         itemSelected = tmpItem.item;
         itemSelected.addClass('selected');
         this.sscroll(true);
@@ -892,11 +844,7 @@ Buttons.runNextItem = function(direction, play) {
             myHistory.push(
                 {
                     loc: oldPos.loc,
-                    pos: 
-                    {
-                        col: tmpItem.col,
-                        top: tmpItem.top
-                    }
+                    pos: itemIndex
                 }
             );
         }
